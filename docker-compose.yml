@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: "postgres:16.2"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: fpoliveira
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: byte_bin
+
+  keydb:
+    image: "eqalpha/keydb:alpine_x86_64_v6.3.4"
+    ports:
+      - "6379:6379"
+
+  localstack:
+    image: "localstack/localstack"
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=${DEBUG:-0}
+    volumes:
+      - "./localstack:/var/lib/localstack:Z"
+      - "${XDG_RUNTIME_DIR}/podman/podman.sock:/var/run/docker.sock:z"
