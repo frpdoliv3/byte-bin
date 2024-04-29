@@ -35,6 +35,7 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation("aws.sdk.kotlin:s3:1.2.1")
 }
 
 tasks.withType<KotlinCompile> {
