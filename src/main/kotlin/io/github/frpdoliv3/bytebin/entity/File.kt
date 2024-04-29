@@ -11,7 +11,7 @@ import jakarta.persistence.Table
 class File(
     @Id
     @Column(columnDefinition = "VARCHAR(24)")
-    var id: String?,
+    var id: String,
 
     @Column(name = "name")
     var name: String,
@@ -26,5 +26,5 @@ class File(
     var mimeType: String,
 
     @OneToMany(mappedBy = "file")
-    var chunks: Set<Chunk>
+    var chunks: Set<Chunk> = emptySet()
 )
