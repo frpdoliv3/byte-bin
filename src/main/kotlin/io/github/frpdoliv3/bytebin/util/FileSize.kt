@@ -10,7 +10,8 @@ value class MiB(private val size: Long) {
 
 operator fun Long.compareTo(other: MiB) = this.compareTo(other.absoluteSize())
 operator fun Long.plus(other: MiB) = this + other.absoluteSize()
-
+operator fun Long.div(other: MiB) = this / other.absoluteSize()
+operator fun Long.rem(other: MiB) = this % other.absoluteSize()
 
 val Long.mib: MiB
     get() = MiB(this)

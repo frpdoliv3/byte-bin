@@ -9,7 +9,7 @@ import jakarta.persistence.*
 class Chunk (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int?,
+    var id: Int? = null,
 
     @Column(name = "position")
     var position: Int,
@@ -19,6 +19,9 @@ class Chunk (
 
     @Column(name = "end_byte")
     var endByte: Long,
+
+    @Column(name = "length")
+    var length: Long,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id")

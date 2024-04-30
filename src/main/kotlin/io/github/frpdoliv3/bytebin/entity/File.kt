@@ -16,12 +16,6 @@ class File(
     @Column(name = "name")
     var name: String,
 
-    @Column(name = "size")
-    var size: Long,
-
-    @Column(name = "chunk_size")
-    var chunkSize: Long,
-
     @Column(name = "mime_type")
     var mimeType: String,
 
