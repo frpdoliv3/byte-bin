@@ -1,5 +1,8 @@
 package io.github.frpdoliv3.bytebin.repository
 
+import io.github.frpdoliv3.bytebin.util.compareTo
+import io.github.frpdoliv3.bytebin.util.mib
+import io.github.frpdoliv3.bytebin.util.plus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -27,16 +30,16 @@ class JedisChunkContentRepository(
         return commands.strlen(chunkId.toByteArray())
     }
 
-    fun splitChunk(size: Long) = sequence {
+    fun splitChunk(size: Long) = sequence<Long> {
         if (size <= THRESHOLD) {
             yield(size)
         } else {
             var sentData = 0L
             while(sentData < size) {
-                if (sentData + THRESHOLD > size) {
+                if ((sentData + THRESHOLD) > size) {
                     yield(size - sentData)
                 } else {
-                    yield(THRESHOLD)
+                    yield(THRESHOLD.absoluteSize())
                 }
                 sentData += THRESHOLD
             }
@@ -66,7 +69,7 @@ class JedisChunkContentRepository(
     }
 
     companion object {
-        const val THRESHOLD = 50L
+        val THRESHOLD = 50.mib
     }
 }
 
