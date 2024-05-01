@@ -23,7 +23,18 @@ class Chunk (
     @Column(name = "length")
     var length: Long,
 
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    var status: Status = Status.PENDING,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id")
     var file: File
-)
+) {
+    enum class Status {
+        PENDING,
+        TTL_EXPIRED,
+        UPLOADED,
+        UPLOADING
+    }
+}

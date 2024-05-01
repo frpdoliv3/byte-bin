@@ -1,10 +1,6 @@
 package io.github.frpdoliv3.bytebin.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "files")
@@ -19,6 +15,16 @@ class File(
     @Column(name = "mime_type")
     var mimeType: String,
 
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    var status: Status = Status.PENDING,
+
     @OneToMany(mappedBy = "file")
     var chunks: Set<Chunk> = emptySet()
-)
+) {
+    enum class Status {
+        PENDING,
+        ONGOING,
+        DONE
+    }
+}
