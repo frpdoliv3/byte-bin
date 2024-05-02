@@ -1,5 +1,6 @@
 package io.github.frpdoliv3.bytebin.controller.test
 
+import io.github.frpdoliv3.bytebin.repository.FileStorageRepository
 import io.github.frpdoliv3.bytebin.repository.JedisChunkContentRepository
 import kotlinx.coroutines.runBlocking
 import org.springframework.web.bind.annotation.PostMapping
@@ -11,14 +12,13 @@ import java.nio.ByteBuffer
 @RestController
 @RequestMapping("/test")
 class TestController(
-    private val chunkContentRepo: JedisChunkContentRepository
+    private val chunkContentRepo: JedisChunkContentRepository,
+    private val fileStorageRepo: FileStorageRepository
 ) {
     @PostMapping
-    fun action(@RequestBody content: ByteArray) {
+    fun action() {
         runBlocking {
-            chunkContentRepo.getContent(10).collect {
-                print(it.toString(Charsets.UTF_8))
-            }
+            fileStorageRepo.startMultipartUpload("testFile")
         }
     }
 }
