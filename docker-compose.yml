@@ -23,4 +23,5 @@ services:
       - DEBUG=${DEBUG:-0}
     volumes:
       - "./localstack:/var/lib/localstack:Z"
-      - "${XDG_RUNTIME_DIR}/podman/podman.sock:/var/run/docker.sock:z"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
