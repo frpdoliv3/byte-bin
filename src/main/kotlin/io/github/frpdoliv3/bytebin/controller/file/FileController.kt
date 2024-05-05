@@ -19,8 +19,9 @@ class FileController(
     private val uploadPayloadUseCase: UploadPayloadUseCase
 ) {
     @PostMapping
-    fun createFile(@RequestBody requestBody: CreateFileRequest): ResponseEntity<Unit> {
-        if (fileService.createFile(requestBody)) {
+    suspend fun createFile(@RequestBody requestBody: CreateFileRequest): ResponseEntity<Unit> {
+        val newFileId = fileService.createFile(requestBody)
+        if (newFileId != null) {
             return ResponseEntity.status(HttpStatus.CREATED).build()
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()

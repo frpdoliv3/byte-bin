@@ -6,10 +6,7 @@ import io.github.frpdoliv3.bytebin.repository.FileRepository
 import io.github.frpdoliv3.bytebin.repository.FileStorageRepository
 import io.github.frpdoliv3.bytebin.service.chunk.ChunkService
 import io.github.frpdoliv3.bytebin.util.UUIDUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrNull
 
@@ -27,14 +24,16 @@ class FileServiceImpl(
         }
     }
 
-    override fun createFile(request: CreateFileRequest): Boolean {
+    override suspend fun createFile(request: CreateFileRequest): Boolean {
         try {
             val file = File(
                 id = UUIDUtils.createID(),
                 name = request.name,
                 mimeType = request.mimeType
             )
-            fileRepo.save(file)
+            withContext(Dispatchers.IO) {
+                fileRepo.save(file)
+            }
             chunkService.createChunks(file, request.size)
             return true
         } catch (e: Exception) {

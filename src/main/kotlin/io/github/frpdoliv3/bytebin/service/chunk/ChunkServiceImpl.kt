@@ -54,7 +54,7 @@ class ChunkServiceImpl(
         }
     }
 
-    override fun createChunks(file: File, fileSize: Long) {
+    override suspend fun createChunks(file: File, fileSize: Long) {
         var position = 1
         var startingByte = 0L
         for (chunkSize in chunkSplits(fileSize)) {
@@ -66,7 +66,9 @@ class ChunkServiceImpl(
                 length = chunkSize,
                 file = file
             )
-            chunkRepo.save(chunk)
+            withContext(Dispatchers.IO) {
+                chunkRepo.save(chunk)
+            }
             startingByte = endByte
             position += 1
         }

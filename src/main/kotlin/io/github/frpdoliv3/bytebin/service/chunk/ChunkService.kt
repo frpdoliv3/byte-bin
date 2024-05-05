@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface ChunkService {
     val events: Flow<Event>
 
-    fun createChunks(file: File, fileSize: Long)
+    suspend fun createChunks(file: File, fileSize: Long)
     suspend fun uploadChunkPayload(fileId: String, payload: ByteArray)
     fun findFileByChunkId(chunkId: Int): File?
     suspend fun loadChunkData(chunkId: Int): ChunkData
