@@ -1,7 +1,8 @@
 package io.github.frpdoliv3.bytebin.service.file
 
-import io.github.frpdoliv3.bytebin.controller.file.dto.CreateFileRequest
+import io.github.frpdoliv3.bytebin.handler.file.dto.CreateFileRequest
 import io.github.frpdoliv3.bytebin.entity.File
+import io.github.frpdoliv3.bytebin.handler.file.dto.CreateFileResponse
 import io.github.frpdoliv3.bytebin.repository.FileRepository
 import io.github.frpdoliv3.bytebin.repository.FileStorageRepository
 import io.github.frpdoliv3.bytebin.service.chunk.ChunkService
@@ -24,21 +25,24 @@ class FileServiceImpl(
         }
     }
 
-    override suspend fun createFile(request: CreateFileRequest): Boolean {
+    override suspend fun createFile(request: CreateFileRequest): CreateFileResult {
         try {
             val file = File(
                 id = UUIDUtils.createID(),
                 name = request.name,
                 mimeType = request.mimeType
             )
-            withContext(Dispatchers.IO) {
+            val savedFile = withContext(Dispatchers.IO) {
                 fileRepo.save(file)
             }
-            chunkService.createChunks(file, request.size)
-            return true
+            val createdChunks = chunkService.createChunks(file, request.size)
+            return CreateFileResult.Success(
+                fileId = savedFile.id,
+                createdChunks
+            )
         } catch (e: Exception) {
             e.printStackTrace()
-            return false
+            return CreateFileResult.Error
         }
     }
 

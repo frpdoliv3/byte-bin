@@ -3,6 +3,7 @@ package io.github.frpdoliv3.bytebin.service.chunk
 import io.github.frpdoliv3.bytebin.entity.Chunk
 import io.github.frpdoliv3.bytebin.entity.File
 import io.github.frpdoliv3.bytebin.model.ChunkData
+import io.github.frpdoliv3.bytebin.model.ChunkStatus
 import io.github.frpdoliv3.bytebin.repository.ChunkCacheRepository
 import io.github.frpdoliv3.bytebin.repository.ChunkRepository
 import io.github.frpdoliv3.bytebin.util.compareTo
@@ -10,8 +11,8 @@ import io.github.frpdoliv3.bytebin.util.div
 import io.github.frpdoliv3.bytebin.util.mib
 import io.github.frpdoliv3.bytebin.util.rem
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
+import io.github.frpdoliv3.bytebin.model.Chunk as ChunkModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
@@ -54,9 +55,10 @@ class ChunkServiceImpl(
         }
     }
 
-    override suspend fun createChunks(file: File, fileSize: Long) {
+    override suspend fun createChunks(file: File, fileSize: Long): List<ChunkModel.Details> {
         var position = 1
         var startingByte = 0L
+        val createdChunks = mutableListOf<Chunk>()
         for (chunkSize in chunkSplits(fileSize)) {
             val endByte = startingByte + chunkSize
             val chunk = Chunk(
@@ -66,22 +68,23 @@ class ChunkServiceImpl(
                 length = chunkSize,
                 file = file
             )
-            withContext(Dispatchers.IO) {
+            createdChunks.add(withContext(Dispatchers.IO) {
                 chunkRepo.save(chunk)
-            }
+            })
             startingByte = endByte
             position += 1
         }
+        return createdChunks.map { it.toModel() }
     }
 
     private fun findUploadingChunk(fileId: String): Chunk? {
-        val uploadingChunk = chunkRepo.findChunkByStatusAndFileIdOrderByPosition(Chunk.Status.UPLOADING, fileId)
+        val uploadingChunk = chunkRepo.findChunkByStatusAndFileIdOrderByPosition(ChunkStatus.UPLOADING, fileId)
         if (uploadingChunk.isPresent) {
             return uploadingChunk.get()
         }
-        val pendingChunk = chunkRepo.findChunkByStatusAndFileIdOrderByPosition(Chunk.Status.PENDING, fileId).getOrNull()
+        val pendingChunk = chunkRepo.findChunkByStatusAndFileIdOrderByPosition(ChunkStatus.PENDING, fileId).getOrNull()
             ?: return null
-        pendingChunk.status = Chunk.Status.UPLOADING
+        pendingChunk.status = ChunkStatus.UPLOADING
         return chunkRepo.save(pendingChunk)
     }
 
@@ -101,7 +104,7 @@ class ChunkServiceImpl(
         if (cachedSize == uploadingChunk.length) {
             _events.emit(ChunkService.Event.ChunkUploaded(uploadingChunk.id!!))
         }
-        uploadingChunk.status = Chunk.Status.UPLOADED
+        uploadingChunk.status = ChunkStatus.UPLOADED
         withContext(Dispatchers.IO) {
             chunkRepo.save(uploadingChunk)
         }

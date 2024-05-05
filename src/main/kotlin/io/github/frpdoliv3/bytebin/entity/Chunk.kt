@@ -1,5 +1,7 @@
 package io.github.frpdoliv3.bytebin.entity
 
+import io.github.frpdoliv3.bytebin.model.Chunk as ChunkModel
+import io.github.frpdoliv3.bytebin.model.ChunkStatus
 import jakarta.persistence.*
 
 @Entity
@@ -25,16 +27,19 @@ class Chunk (
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    var status: Status = Status.PENDING,
+    var status: ChunkStatus = ChunkStatus.PENDING,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id")
     var file: File
 ) {
-    enum class Status {
-        PENDING,
-        TTL_EXPIRED,
-        UPLOADED,
-        UPLOADING
-    }
+    fun toModel(): ChunkModel.Details = ChunkModel.Details(
+        id = id!!,
+        position = position,
+        startByte = startByte,
+        endByte = endByte,
+        length = length,
+        status = status,
+        fileId = file.id
+    )
 }
