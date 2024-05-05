@@ -1,10 +1,6 @@
 package io.github.frpdoliv3.bytebin.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "files")
@@ -16,15 +12,23 @@ class File(
     @Column(name = "name")
     var name: String,
 
-    @Column(name = "size")
-    var size: Long,
-
-    @Column(name = "chunk_size")
-    var chunkSize: Long,
-
     @Column(name = "mime_type")
     var mimeType: String,
 
-    @OneToMany(mappedBy = "file")
+    @Column(name = "upload_id", nullable = true)
+    var uploadId: String? = null,
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    var status: Status = Status.PENDING,
+
+    //TODO: remove eager loading and replace this by domain models
+    @OneToMany(mappedBy = "file", fetch = FetchType.EAGER)
     var chunks: Set<Chunk> = emptySet()
-)
+) {
+    enum class Status {
+        PENDING,
+        ONGOING,
+        DONE
+    }
+}
