@@ -11,9 +11,9 @@ import redis.clients.jedis.commands.JedisBinaryCommands
 import redis.clients.jedis.params.SetParams
 
 @Repository
-class JedisChunkContentRepository(
+class JedisChunkCacheRepository(
     private val commands: JedisBinaryCommands,
-): ChunkContentRepository {
+): ChunkCacheRepository {
     private fun putContentIfNotExists(chunkId: Int, content: ByteArray): Boolean {
         val setParams = SetParams().apply {
             nx()
