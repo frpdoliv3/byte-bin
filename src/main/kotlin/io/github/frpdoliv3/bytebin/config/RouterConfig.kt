@@ -16,6 +16,7 @@ class RouterConfig {
         accept(MediaType.APPLICATION_JSON).nest {
             "/files".nest {
                 POST("", fileHandler::createFile)
+                PUT("{file_id}", fileHandler::uploadFile)
             }
         }
     }

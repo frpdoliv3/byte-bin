@@ -1,4 +1,4 @@
-package io.github.frpdoliv3.bytebin.use_case
+package io.github.frpdoliv3.bytebin.use_case.upload_payload
 
 import io.github.frpdoliv3.bytebin.entity.File
 import io.github.frpdoliv3.bytebin.service.file.FileService
@@ -17,15 +17,16 @@ class UploadPayloadUseCase(
         }
     }
 
-    operator fun invoke(fileId: String, payload: ByteArray) {
-        val fileStatus = fileService.fileStatus(fileId)
+    operator fun invoke(fileId: String, payload: ByteArray): UploadPayloadResult {
+        val fileStatus = fileService.fileStatus(fileId) ?: return UploadPayloadResult.FileNotFound
         if (fileStatus == File.Status.DONE) {
-            return
+            return UploadPayloadResult.FileAlreadyUploaded
         }
         val isFileMultipart = fileService.isMultipart(fileId)!!
         if (fileStatus == File.Status.PENDING) {
             handleUploadStart(fileId, isFileMultipart)
         }
         fileService.upload(fileId, payload)
+        return UploadPayloadResult.Success
     }
 }

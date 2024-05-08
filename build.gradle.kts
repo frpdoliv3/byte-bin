@@ -39,6 +39,7 @@ dependencies {
     implementation("aws.sdk.kotlin:s3:1.2.1")
     implementation("redis.clients:jedis:5.1.2")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
+    implementation("io.arrow-kt:arrow-core:1.2.4")
 }
 
 tasks.withType<KotlinCompile> {

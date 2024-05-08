@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.springframework.stereotype.Repository
+import java.net.ConnectException
 
 @Repository
 class S3FileStorageRepository(
@@ -19,13 +20,17 @@ class S3FileStorageRepository(
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    override suspend fun startMultipartUpload(fileId: String): String {
+    override suspend fun startMultipartUpload(fileId: String): String? {
         val createMultipartUploadRequest = CreateMultipartUploadRequest {
             bucket = this@S3FileStorageRepository.bucket
             key = fileId
         }
-        val result = s3Client.createMultipartUpload(createMultipartUploadRequest)
-        return result.uploadId!!
+        try {
+            val result = s3Client.createMultipartUpload(createMultipartUploadRequest)
+            return result.uploadId!!
+        } catch (e: ConnectException) {
+            return null
+        }
     }
 
     override suspend fun uploadFile(fileId: String, payload: ByteArray): String? {
